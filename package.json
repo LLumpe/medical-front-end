@@ -106,29 +106,5 @@
   ],
   "uni-app": {
     "scripts": {}
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "npx validate-commit-msg"
-    }
-  },
-  "config": {
-    "validate-commit-msg": {
-      "types": [
-        "feat",
-        "fix",
-        "docs",
-        "style",
-        "refactor",
-        "perf",
-        "test",
-        "chore",
-        "build",
-        "ci",
-        "revert"
-      ],
-      "warnOnly": false,
-      "extends": []
-    }
   }
 }
