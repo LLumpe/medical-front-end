@@ -105,5 +105,24 @@
   ],
   "uni-app": {
     "scripts": {}
+  },
+  "config": {
+    "validate-commit-msg": {
+      "types": [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "chore",
+        "build",
+        "ci",
+        "revert"
+      ],
+      "warnOnly": false,
+      "extends": []
+    }
   }
 }
