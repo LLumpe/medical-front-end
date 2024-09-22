@@ -94,6 +94,7 @@
     "@vue/cli-service": "~5.0.0",
     "babel-plugin-import": "^1.11.0",
     "cross-env": "^7.0.2",
+    "husky": "^9.1.6",
     "jest": "^25.4.0",
     "postcss-comment": "^2.0.0",
     "typescript": "~4.5.5",
@@ -105,6 +106,11 @@
   ],
   "uni-app": {
     "scripts": {}
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "npx validate-commit-msg"
+    }
   },
   "config": {
     "validate-commit-msg": {
