@@ -1,0 +1,210 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/editName/index",
+      "style": {
+        "navigationBarTitleText": "昵称修改"
+      }
+    },
+    {
+<<<<<<< HEAD
+=======
+      "path": "pages/privacyPolicy/index",
+      "style": {
+        "navigationBarTitleText": "隐私政策"
+      }
+    },
+    {
+      "path": "pages/publishOrder/index",
+      "style": {
+        "navigationBarTitleText": "发布维修订单",
+        "navigationBarBackgroundColor": "#09C46E",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/address/index",
+      "style": {
+        "navigationBarTitleText": "我的地址管理",
+        "navigationBarBackgroundColor": "#09C46E",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/orderDetail/index",
+      "style": {
+        "navigationBarTitleText": "确认维修订单"
+      }
+    },
+    {
+      "path": "pages/orderBack/index",
+      "style": {
+        "navigationBarTitleText": "售后"
+      }
+    },
+    {
+>>>>>>> d9f58e107c55de57d2b92099b260679668ee6a57
+      "path": "pages/me/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/register/index",
+      "style": {
+        "navigationBarTitleText": "完善个人信息"
+      }
+    },
+    {
+      "path": "pages/editProfile/index",
+      "style": {
+        "navigationBarTitleText": "修改个人信息"
+      }
+    },
+    {
+      "path": "pages/editPhoneNumber/index",
+      "style": {
+        "navigationBarTitleText": "修改手机号"
+      }
+    },
+    {
+      "path": "pages/UAvatarCropper/index",
+      "style": {
+        "navigationBarTitleText": "头像上传",
+        "navigationBarBackgroundColor": "#000000"
+      }
+<<<<<<< HEAD
+=======
+    },
+    {
+      "path": "pages/announcement/index",
+      "style": {
+        "navigationBarTitleText": "公告"
+      }
+    },
+    {
+      "path": "pages/volunteerInformation/index",
+      "style": {
+        "navigationBarTitleText": "详细信息"
+      }
+    },
+    {
+      "path": "pages/requestSubscribeMessage/index",
+      "style": {
+        "navigationBarTitleText": "设置订阅"
+      }
+    }
+  ],
+  "subPackage": [
+    {
+      "root": "pagesPackage/missionPackage",
+      "pages": []
+    },
+    {
+      "root": "pagesPackage/mallPackage",
+      "pages": []
+>>>>>>> d9f58e107c55de57d2b92099b260679668ee6a57
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "高阳中捷维修接单",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#f0f2f5"
+  },
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#000000",
+    "backgroundColor": "#F8F8F8",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "主页",
+        "iconPath": "static/images/tabbar/home.png",
+        "selectedIconPath": "static/images/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "我的",
+        "iconPath": "static/images/tabbar/user.png",
+        "selectedIconPath": "static/images/tabbar/user-active.png"
+      }
+    ]
+  },
+  "condition": {
+    //模式配置，仅开发期间生效
+    "current": 0, //当前激活的模式（list 的索引项）
+    "list": [
+      {
+        "name": "首页",
+        "path": "pages/index/index"
+      },
+      {
+        "name": "测试页", //模式名称
+        "path": "pages/test/index", //启动页面，必选
+        "query": "" //启动参数，在页面的onLoad函数里面得到。
+      },
+      {
+        "name": "个人页",
+        "path": "pages/me/index",
+        "query": ""
+      },
+      {
+        "name": "完善个人信息",
+        "path": "pages/register/index",
+        "query": ""
+      },
+      {
+        "name": "修改个人信息",
+        "path": "pages/editProfile/index",
+        "query": ""
+      },
+      {
+        "name": "修改手机号",
+        "path": "pages/editPhoneNumber/index",
+        "query": ""
+      },
+      {
+        "name": "志愿者列表",
+        "path": "pages/volunteerList/index",
+        "query": ""
+      },
+      {
+        "name": "任务大厅",
+        "path": "pages/missionHall/index",
+        "query": ""
+      },
+      {
+        "name": "我的任务",
+        "path": "pages/myMissions/index",
+        "query": ""
+      },
+      {
+        "name": "寻人",
+        "path": "pages/mission/index",
+        "query": "id=7"
+      },
+      {
+        "name": "案件信息",
+        "path": "pages/missionInformation/index",
+        "query": "id=3"
+      },
+      {
+        "name": "人脸识别历史结果",
+        "path": "pages/faceRecognitionHistory/index",
+        "query": "id=7"
+      },
+      {
+        "name": "救援流程",
+        "path": "pages/tips/index",
+        "query": ""
+      }
+    ]
+  }
+}
