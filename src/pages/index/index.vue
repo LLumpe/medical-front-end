@@ -1,51 +1,54 @@
+<!--
+ * @Author: LLumpe LLumpe@163.com
+ * @Date: 2024-09-23 22:43:09
+ * @LastEditors: LLumpe LLumpe@163.com
+ * @LastEditTime: 2024-09-24 16:39:37
+ * @FilePath: \medical-front-end\src\pages\index\index.vue
+ * @Description: 
+ * 
+ * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved. 
+-->
 <template>
-	<view class="content">
-        <image class="logo" src="../../static/logo.png"></image>
-		<view>
-            <text class="title">{{title}}</text>
-        </view>
-	</view>
+  <view> </view>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
+import { defineComponent } from "vue";
 
-	export default Vue.extend({
-		data() {
-			return {
-				title: 'Hello'
-			}
-		},
-		onLoad() {
-
-		},
-		methods: {
-
-		}
-	});
+export default defineComponent({
+  components: {},
+});
 </script>
 
-<style>
-	.content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
+<style lang="scss" scoped>
+.content {
+  text-align: center;
+  height: 400upx;
+}
 
-	.logo {
-		height: 200rpx;
-		width: 200rpx;
-		margin: 200rpx auto 50rpx auto;
-	}
+.logo {
+  height: 200upx;
+  width: 200upx;
+  margin-top: 200upx;
+}
 
-	.text-area {
-		display: flex;
-		justify-content: center;
-	}
+.title {
+  font-size: 36upx;
+  color: #8f8f94;
+}
 
-	.title {
-		font-size: 36rpx;
-		color: #8f8f94;
-	}
+.body {
+  margin-top: 64rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  &-leaderBoard {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 0 40rpx 0 40rpx;
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+}
 </style>
