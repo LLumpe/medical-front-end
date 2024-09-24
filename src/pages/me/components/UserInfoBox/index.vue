@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-07-09 03:18:08
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-09-24 18:00:15
+ * @LastEditTime: 2024-09-24 23:11:12
  * @FilePath: \medical-front-end\src\pages\me\components\userInfoBox\index.vue
  * @Description: 
  * 
@@ -18,16 +18,23 @@
           backgroundImage:
             status !== 'unlogin' && avatarUrl ? `url(${avatarUrl})` : null,
         }"
+        @click="
+          () => {
+            openImage(avatarUrl, status !== 'unlogin');
+          }
+        "
       />
       <view class="name" @click="handleJump">
-        <span class="name-lg">
-          {{ status !== "unlogin" && name ? name : "登录/注册" }}</span
-        >
-        <span class="name-ws">{{
-          status !== "unlogin" && phone ? phone : "支持微信快速登录"
-        }}</span>
+        <span class="name-lg" :class="{ 'name-unlogin': status === 'unlogin' }">
+          {{ status !== "unlogin" && name ? name : "登录/注册" }}
+        </span>
+        <span class="name-ws">
+          {{ status !== "unlogin" && phone ? phone : "支持微信快速登录" }}
+        </span>
       </view>
-      <view class="edit"> <span>编辑个人资料</span> </view>
+      <view v-if="status !== 'unlogin'" class="edit" @click="handleJump">
+        <span>编辑个人资料</span>
+      </view>
       <image
         class="setting"
         src="../../../../static/images/me/setting.png"
@@ -49,13 +56,8 @@ import dayjs from "@/utils/dayjs";
 import { navigateTo } from "@/utils/helper";
 import { Case } from "@/api/types/models";
 import { useStore } from "vuex";
-const useLogin = () => {
-  const handleLogin = () => {
-    authService.login(true);
-  };
+import { openImage } from "@/utils/image";
 
-  return { handleLogin };
-};
 const useWorkerRepairInfo = () => {
   //注册store实例
   const store = useStore();
@@ -91,9 +93,10 @@ export default defineComponent({
   },
   setup(props) {
     const name = computed(() => {
-      return props.status === "me"
-        ? props?.userInfo?.volunteerInformation?.name
-        : props?.userInfo?.name;
+      // return props.status === "me"
+      //   ? props?.userInfo?.volunteerInformation?.name
+      //   : props?.userInfo?.name;
+      return "LLumpe";
     });
 
     const sex = computed(() => {
@@ -112,15 +115,17 @@ export default defineComponent({
     });
 
     const avatarUrl = computed(() => {
-      return props.status === "me"
-        ? props?.userInfo?.avatarUrl
-        : props?.userInfo?.volunteer?.avatarUrl;
+      // return props.status === "me"
+      //   ? props?.userInfo?.avatarUrl
+      //   : props?.userInfo?.volunteer?.avatarUrl;
+      return "https://p1-dy.bytexservice.com/img/tos-cn-avt-0015/37052ad8bbf8a36d6386f47afc601ae1~c5_1080x1080.jpeg?from=4010531038";
     });
 
     const phone = computed(() => {
-      return props.status === "me"
-        ? props?.userInfo?.phone
-        : props?.userInfo?.volunteer?.phone;
+      // return props.status === "me"
+      //   ? props?.userInfo?.phone
+      //   : props?.userInfo?.volunteer?.phone;
+      return "18570753354";
     });
 
     const handleEditProfile = () => {
@@ -200,7 +205,6 @@ export default defineComponent({
     console.log("isLogin?", props.status);
     return {
       moreInfo,
-      ...useLogin(),
       name,
       sex,
       registerTimeFromNow,
@@ -215,6 +219,7 @@ export default defineComponent({
       // ...useHistory(props.status, props.userInfo),
       handleMoreRepairOrder,
       ...useWorkerRepairInfo(),
+      openImage,
     };
   },
 });
@@ -268,7 +273,7 @@ export default defineComponent({
   .name {
     display: flex;
     flex-direction: column;
-    margin: 50rpx 0 0 0;
+    margin: 60rpx 0 0 0;
     line-height: 44rpx;
     transition: 1s all;
 
@@ -283,6 +288,19 @@ export default defineComponent({
       color: $uni-text-color;
       font-size: $uni-font-size-base;
       letter-spacing: 0.5rpx;
+    }
+
+    &-unlogin {
+      border-radius: 20rpx;
+      padding: 20rpx 30rpx;
+      font-size: $uni-font-size-base;
+      font-weight: $uni-font-weight-bolder;
+      background-color: $uni-bg-color-grey;
+      letter-spacing: 0.5rpx;
+      &:active {
+        background-color: rgba(85, 85, 85, 0.3);
+        /* 半透明蓝色 */
+      }
     }
   }
 
@@ -300,11 +318,13 @@ export default defineComponent({
     font-weight: $uni-font-weight-bolder;
     background-color: $uni-bg-color-grey;
     letter-spacing: 0.5rpx;
+
     &:active {
       background-color: rgba(85, 85, 85, 0.3);
       /* 半透明蓝色 */
     }
   }
+
   .setting {
     width: 50rpx;
     height: 50rpx;

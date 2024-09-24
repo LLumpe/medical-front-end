@@ -10,7 +10,7 @@
     <view class="title" :style="{ lineHeight: `${menuHeight}px` }"> 我的 </view>
     <view class="box">
       <UserInfoBox
-        :status="topStatus"
+        :status="'me'"
         :user-info="myInfo"
         :userRepairInfo="userRepairInfo"
       />
@@ -24,8 +24,9 @@ import UserInfoBox from "./components/UserInfoBox/index.vue";
 import { useStore } from "vuex";
 import { useTop } from "@/uses/useTop";
 import store from "@/store";
+import { openImage } from "@/utils/image";
 import { repairOrder } from "@/api/types/models";
-const userRepairInfo = ref<repairOrder>({});
+const userRepairInfo = ref<repairOrder | null>(null);
 const logged = computed(() => {
   console.log("logged", store.getters.logged);
   return store.getters.logged;

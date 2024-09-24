@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-23 22:43:09
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-09-24 18:39:15
+ * @LastEditTime: 2024-09-24 22:32:20
  * @FilePath: \medical-front-end\src\pages\setting\index.vue
  * @Description: 
  * 
@@ -11,18 +11,7 @@
 <template>
   <view class="body">
     <UCellGroup title=" ">
-      <UCellItem title="账号设置" hover-class="none" icon="setting-fill">
-      </UCellItem>
-      <UCellItem
-        title="退出登录"
-        :arrow="false"
-        hover-class="none"
-        icon="setting-fill"
-      />
-    </UCellGroup>
-    <UCellGroup title=" ">
-      <UCellItem title="账号设置" hover-class="none" icon="setting-fill">
-      </UCellItem>
+      <UCellItem title="账号设置" hover-class="none" icon="setting-fill" />
       <UCellItem
         title="退出登录"
         :arrow="false"
