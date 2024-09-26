@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-26 13:57:51
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-09-26 14:22:24
+ * @LastEditTime: 2024-09-26 17:23:22
  * @FilePath: \medical-front-end\src\components\UBottomLight\index.vue
  * @Description: 
  * 
@@ -53,12 +53,13 @@ export default defineComponent({
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  margin-top: 20rpx;
   &-item {
-    width: 20rpx;
-    height: 10rpx;
+    width: 15rpx;
+    height: 15rpx;
     margin: 0 10rpx;
-    border: 0.5rpx solid gray;
-    border-radius: 10rpx;
+    border: 1rpx solid gray;
+    border-radius: 50%;
   }
 }
 </style>

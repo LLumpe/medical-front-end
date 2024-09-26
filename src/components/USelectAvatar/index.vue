@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-26 13:57:51
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-09-26 16:32:17
+ * @LastEditTime: 2024-09-26 16:55:07
  * @FilePath: \medical-front-end\src\components\USelectAvatar\index.vue
  * @Description: 
  * 
@@ -107,7 +107,7 @@ export default defineComponent({
         box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
         transition: all 0.5s;
         &-selected {
-          border: 0.5rpx solid $uni-text-color-grey;
+          border: 1rpx solid $uni-color-primary;
           box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
         }
       }

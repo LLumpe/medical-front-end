@@ -2,21 +2,25 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-23 22:43:09
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-09-24 16:39:37
+ * @LastEditTime: 2024-09-26 17:00:55
  * @FilePath: \medical-front-end\src\pages\index\index.vue
  * @Description: 
  * 
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved. 
 -->
 <template>
-  <view> </view>
+  <view>
+    <Top></Top>
+    <ChatList></ChatList>
+  </view>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
+import Top from "./components/Top/index.vue";
+import ChatList from "./components/ChatList/index.vue";
 export default defineComponent({
-  components: {},
+  components: { Top, ChatList },
 });
 </script>
 
