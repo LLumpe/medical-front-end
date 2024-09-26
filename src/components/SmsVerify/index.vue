@@ -11,12 +11,12 @@
     </view>
     <view class="code">
       <message-input
-        mode="bottomLine"
+        mode="box"
         :maxlength="6"
         :width="65"
         :font-size="36"
         inactive-color="#C7C7CC"
-        active-color="#799351"
+        active-color="#333"
         style="margin-left: -3px"
         @change="handleCodeChange"
         @finish="handleCodeFinish"

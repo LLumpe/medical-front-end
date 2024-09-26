@@ -11,23 +11,26 @@
         @input="getVal"
         @focus="handleFocus"
         @blur="handleBlur"
-      >
-      <view
-        v-for="(item, index) in loopCharArr"
-        :key="index"
-      >
+      />
+      <view v-for="(item, index) in loopCharArr" :key="index">
         <view
-          :class="[breathe && charArrLength == index && isFocus ? 'u-breathe' : '', 'u-char-item',
-                   charArrLength === index && mode == 'box' ? 'u-box-active' : '',
-                   mode === 'box' ? 'u-box' : ''
+          :class="[
+            breathe && charArrLength == index && isFocus ? 'u-breathe' : '',
+            'u-char-item',
+            charArrLength === index && mode == 'box' ? 'u-box-active' : '',
+            mode === 'box' ? 'u-box' : '',
           ]"
           :style="{
             fontWeight: bold ? 'bold' : 'normal',
             fontSize: fontSize + 'rpx',
             width: width + 'rpx',
             height: width + 'rpx',
+            marginRight: '4rpx',
             color: charArr[index] ? activeColor : inactiveColor,
-            borderColor: charArrLength === index && mode == 'box' ? activeColor : inactiveColor
+            borderColor:
+              charArrLength === index && mode == 'box'
+                ? activeColor
+                : inactiveColor,
           }"
         >
           <view
@@ -35,27 +38,47 @@
             class="u-placeholder-line"
             :style="{
               display: charArrLength === index ? 'block' : 'none',
-              height: width * 0.5 +'rpx'
+              height: width * 0.5 + 'rpx',
             }"
           />
           <view
             v-if="mode === 'middleLine' && charArrLength <= index"
-            :class="[breathe && charArrLength == index && isFocus ? 'u-breathe' : '', charArrLength === index ? 'u-middle-line-active' : '']"
+            :class="[
+              breathe && charArrLength == index && isFocus ? 'u-breathe' : '',
+              charArrLength === index ? 'u-middle-line-active' : '',
+            ]"
             class="u-middle-line"
-            :style="{height: bold ? '4px' : '2px', background: charArrLength === index && isFocus ? activeColor : inactiveColor}"
+            :style="{
+              height: bold ? '4px' : '2px',
+              background:
+                charArrLength === index && isFocus
+                  ? activeColor
+                  : inactiveColor,
+            }"
           />
           <view
             v-if="mode === 'bottomLine'"
-            :class="[breathe && charArrLength == index && isFocus ? 'u-breathe' : '', charArrLength === index ? 'u-buttom-line-active' : '']"
+            :class="[
+              breathe && charArrLength == index && isFocus ? 'u-breathe' : '',
+              charArrLength === index ? 'u-buttom-line-active' : '',
+            ]"
             class="u-bottom-line"
-            :style="{height: bold ? '4px' : '2px', background: charArrLength === index && isFocus ? activeColor : charArr[index] ? activeColor : inactiveColor}"
+            :style="{
+              height: bold ? '4px' : '2px',
+              background:
+                charArrLength === index && isFocus
+                  ? activeColor
+                  : charArr[index]
+                  ? activeColor
+                  : inactiveColor,
+            }"
           />
           <block v-if="!dotFill">
-            {{ charArr[index] ? charArr[index] : '' }}
+            {{ charArr[index] ? charArr[index] : "" }}
           </block>
           <block v-else>
             <text class="u-dot">
-              {{ charArr[index] ? '●' : '' }}
+              {{ charArr[index] ? "●" : "" }}
             </text>
           </block>
         </view>

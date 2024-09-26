@@ -8752,6 +8752,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"lottie-miniprogram@^1.0.12":
+  "integrity" "sha512-2ITtXAyeDXbftvYYe5w0ayl8jTV8laylWMCdJofpka1q205NkjRNj7kX+iIZZ/YjKh1f8plWxb9gSFHkC7BLUQ=="
+  "resolved" "https://registry.npmmirror.com/lottie-miniprogram/-/lottie-miniprogram-1.0.12.tgz"
+  "version" "1.0.12"
+
 "lower-case-first@^1.0.0":
   "integrity" "sha1-5dp8JvKacHO+AtUrrJmA5ZIq36E="
   "resolved" "https://registry.npm.taobao.org/lower-case-first/download/lower-case-first-1.0.2.tgz?cache=0&sync_timestamp=1606869725622&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Flower-case-first%2Fdownload%2Flower-case-first-1.0.2.tgz"

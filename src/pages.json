@@ -33,7 +33,7 @@
     {
       "path": "pages/register/index",
       "style": {
-        "navigationBarTitleText": "完善个人信息"
+        "navigationBarTitleText": "登录"
       }
     },
     {

@@ -1,7 +1,14 @@
 <template>
   <view class="page">
-    <view v-if="step === 1" class="step">
-      <view class="title"> 绑定手机号 </view>
+    <!-- 第一步 欢迎 -->
+    <view v-if="step === 0" class="step fade-in">
+      <view class="title"> 欢迎使用医疗智能聊天助手 </view>
+      <Welcome />
+    </view>
+
+    <!-- 第二步 绑定手机号码 -->
+    <view v-if="step === 1" class="step fade-in">
+      <view class="title"> 输入手机号验证码 </view>
       <sms-verify
         v-if="step === 1"
         :phone="smsForm.phone"
@@ -11,7 +18,7 @@
         @codeChange="handleCodeChange"
       />
     </view>
-    <view v-if="step === 1" style="margin-top: 50rpx">
+    <view v-if="step === 1" style="margin-bottom: 30rpx">
       <checkbox-group @change="handleAgreeChange">
         <checkbox value="agree" color="#09C46E" style="transform: scale(0.7)" />
         <span style="font-size: 24rpx">
@@ -29,6 +36,19 @@
           ></span
         >
       </checkbox-group>
+    </view>
+
+    <!-- 第三步  输入头像-->
+    <view v-if="step === 2" class="step fade-in">
+      <view class="title"> 上传医生肖像 </view>
+      <UUploader
+        v-modal="formData.avatarUrl"
+        :image-styles="imageStyles"
+        @select="handleImageSelect"
+        @delete="handleDelete"
+        limit="1"
+        title="选择一张医生肖像"
+      />
     </view>
     <!-- <view v-if="step === 2" class="step">
       <view class="title"> 绑定个人身份信息 </view>
@@ -50,38 +70,72 @@
         label-width="180"
       />
     </view> -->
-
+    <!-- 第四步  获取3D图像-->
+    <view v-if="step === 3" class="step fade-in">
+      <view class="title"> 请选择数字人虚拟形象 </view>
+      <USelectAvatar></USelectAvatar>
+    </view>
     <view class="actions">
-      <u-button
-        type="primary"
-        shape="circle"
-        shadow
+      <!-- <u-button
+        class="actions-item"
         :disabled="!isAllowNextStep"
         :loading="isLoading"
         open-type="getUserInfo"
         @getuserinfo="handleNextStep"
       >
-        确认提交
+        取消
       </u-button>
+      <u-button
+        class="actions-item"
+        :disabled="!isAllowNextStep"
+        :loading="isLoading"
+        open-type="getUserInfo"
+        @getuserinfo="handleNextStep"
+      >
+        下一步
+      </u-button> -->
+      <button
+        class="actions-item"
+        @click="handleNextStep"
+        :disabled="!isAllowNextStep"
+      >
+        {{ step === 3 ? "完成注册" : "下一步" }}
+      </button>
+      <button class="actions-item" @click="handleCancelStep">取消</button>
     </view>
+    <UBottomLight :steps="4" :current-step="step" />
   </view>
 </template>
 
 <script lang="ts">
 import authService from "@/service/authService";
 import { computed, defineComponent, reactive, ref } from "vue";
-import UInput from "@/components/UInput/index.vue";
+import Welcome from "@/components/Welcome/index.vue";
+import UUploader from "@/components/UUploader/index.vue";
 import UButton from "@/components/UButton/index.vue";
 import SmsVerify from "@/components/SmsVerify/index.vue";
+import UBottomLight from "@/components/UBottomLight/index.vue";
+import USelectAvatar from "@/components/USelectAvatar/index.vue";
 import {
   requestBindPhone,
   requestBindVolunteerInformation,
   requestUpdateWechatUserInfo,
 } from "@/api/user";
-import { navigateBack, navigateTo, showToast } from "@/utils/helper";
+import {
+  hideLoading,
+  navigateBack,
+  navigateTo,
+  showLoading,
+  showModalError,
+  showToast,
+  switchTab,
+} from "@/utils/helper";
 import store from "@/store";
-
-const step = ref(1);
+export interface formType {
+  id: string;
+  avatarUrl: Array<string>;
+}
+const step = ref(0);
 
 const useSmsVerify = () => {
   const smsForm = reactive({
@@ -109,7 +163,6 @@ const useSmsVerify = () => {
       code: smsForm.code,
     });
   };
-
   return {
     smsForm,
     handlePhoneChange,
@@ -118,7 +171,32 @@ const useSmsVerify = () => {
     handleAgreeChange,
   };
 };
-
+// const initCanvas = () => {
+//   wx.createSelectorQuery()
+//     .select("#wc-canvas")
+//     .fields({
+//       node: true,
+//       size: true,
+//     })
+//     .exec((res: any) => {
+//       const canvas = res[0].node;
+//       const ctx = canvas.getContext("2d");
+//       const dpr = wx.getSystemInfoSync().pixelRatio;
+//       canvas.width = res[0].width * dpr;
+//       canvas.height = res[0].height * dpr;
+//       ctx.scale(dpr, dpr);
+//       lottie.setup(canvas);
+//       lottie.loadAnimation({
+//         loop: true,
+//         autoplay: true,
+//         // animationData: "../../static/register/welcome.json",
+//         path: "../../static/register/welcome.json",
+//         rendererSettings: {
+//           context: ctx,
+//         },
+//       });
+//     });
+// };
 const useProfileVerify = () => {
   const profileForm = reactive({
     name: "",
@@ -139,60 +217,106 @@ const useProfileVerify = () => {
 };
 
 export default defineComponent({
-  components: { UButton, SmsVerify },
+  components: { SmsVerify, UBottomLight, Welcome, UUploader, USelectAvatar },
   setup() {
     const smsVerify = useSmsVerify();
     const profileVerify = useProfileVerify();
     const isLoading = ref(false);
     const handleNextStep = async (userInfoRes: any) => {
-      const userInfo: UniApp.GetUserInfoRes = userInfoRes.detail;
-
-      isLoading.value = true;
-      if (step.value === 1) {
-        try {
-          if (!smsVerify.smsForm.agree) {
-            showToast("绑定失败，您尚未同意用户服务协议和隐私政策");
-          } else {
-            await smsVerify.verifyPhone();
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-      // else if (step.value === 2) {
+      // const userInfo: UniApp.GetUserInfoRes = userInfoRes.detail;
+      // isLoading.value = true;
+      // if (step.value === 1) {
       //   try {
-      //     await profileVerify.verifyProfile(userInfo);
-      //     showToast("验证成功", "success");
-      //     await authService.getUserInfo();
-      //     navigateBack();
+      //     if (!smsVerify.smsForm.agree) {
+      //       showToast("绑定失败，您尚未同意用户服务协议和隐私政策");
+      //     } else {
+      //       await smsVerify.verifyPhone();
+      //     }
       //   } catch (e) {
       //     console.log(e);
       //   }
       // }
-      isLoading.value = false;
+      // // else if (step.value === 2) {
+      // //   try {
+      // //     await profileVerify.verifyProfile(userInfo);
+      // //     showToast("验证成功", "success");
+      // //     await authService.getUserInfo();
+      // //     navigateBack();
+      // //   } catch (e) {
+      // //     console.log(e);
+      // //   }
+      // // }
+      // isLoading.value = false;
+      if (step.value !== 3) {
+        step.value = step.value + 1;
+      } else {
+        uni.switchTab({
+          url: "/pages/index/index",
+        });
+      }
+    };
+    const formData = reactive<formType>({
+      id: "",
+      avatarUrl: [],
+    });
+    //选择图片
+    const handleImageSelect = async (e: any) => {
+      showLoading();
+      try {
+        const tempFilePath = e.tempFilePaths;
+        for (let i = 0; i < tempFilePath.length; i++) {
+          setTimeout(() => {
+            console.log("这里模拟网络请求，获取线上地址");
+          }, 1000);
+          // const imageUrl = await requestUploadImage(tempFilePath[i]);
+          formData.avatarUrl.push(tempFilePath as string);
+        }
+        showToast("上传成功", "success");
+        hideLoading();
+      } catch (error) {
+        console.log(error);
+        hideLoading();
+        showModalError("上传图片失败");
+      }
+    };
+
+    //删除照片
+    const handleDelete = (e: any) => {
+      formData.avatarUrl.splice(e.index, 1);
+    };
+    const handleCancelStep = () => {
+      navigateBack();
     };
     const handlePrivacypolicy = () => {
       navigateTo("/pages/privacyPolicy/index");
     };
     const isAllowNextStep = computed(() => {
+      if (step.value === 0) {
+        return true;
+      }
       if (step.value === 1) {
         return (
           smsVerify.smsForm.phone.length === 11 &&
           smsVerify.smsForm.code.length === 6
         );
-      } else if (step.value === 2) {
-        return (
-          profileVerify.profileForm.name.length >= 2 &&
-          profileVerify.profileForm.IDCard.length === 18
-        );
+      } else {
+        return true;
       }
+      // } else if (step.value === 2) {
+      //   return (
+      //     profileVerify.profileForm.name.length >= 2 &&
+      //     profileVerify.profileForm.IDCard.length === 18
+      //   );
+      // }
     });
     return {
       handlePrivacypolicy,
       step,
       isAllowNextStep,
       handleNextStep,
+      handleCancelStep,
       isLoading,
+      handleImageSelect,
       ...smsVerify,
       ...profileVerify,
     };
@@ -201,7 +325,7 @@ export default defineComponent({
     if (query && query.step === "2") {
       step.value = 1;
     } else {
-      step.value = 1;
+      step.value = 0;
     }
   },
   onUnload() {
@@ -216,7 +340,6 @@ export default defineComponent({
 .page {
   // position: relative;
   width: 700rpx;
-  height: 900rpx;
   margin: auto;
   margin-top: 180rpx;
   display: flex;
@@ -226,20 +349,30 @@ export default defineComponent({
   border-radius: 20rpx;
   border: 2rpx solid $uni-border-color;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  transition: all 1s;
 }
 
 .title {
   font-size: $uni-font-size-xxl;
   margin-bottom: 50rpx;
+  font-weight: $uni-font-weight-bolder;
 }
 
 .actions {
   // position: absolute;
   // top: 750rpx;
   // left: 0;
-  box-sizing: border-box;
   width: 100vw;
-  text-align: center;
+  padding: 0 72rpx;
+  box-sizing: border-box;
+  &-item {
+    float: right;
+    width: 180rpx;
+    margin-left: 40rpx;
+    padding: 0 30rpx;
+    border-radius: 10rpx;
+    font-size: $uni-font-size-base;
+  }
 }
 
 .step {
@@ -250,5 +383,16 @@ export default defineComponent({
   // left: 0;
   box-sizing: border-box;
   width: 100vw;
+}
+.fade-in {
+  animation: fadeIn 2s ease forwards; /* 动画持续时间为2秒 */
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0; /* 初始透明度 */
+  }
+  100% {
+    opacity: 1; /* 完全不透明 */
+  }
 }
 </style>
