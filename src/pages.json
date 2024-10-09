@@ -8,17 +8,23 @@
       }
     },
     {
+      "path": "pages/chatDetail/index",
+      "style": {
+        "navigationBarTitleText": "",
+        "enablePullDownRefresh": true,
+        "app-plus": {
+          "softinputMode": "adjustPlan"
+        }
+      }
+    },
+
+    {
       "path": "pages/remind/index",
       "style": {
         "navigationBarTitleText": "通知"
       }
     },
-    {
-      "path": "pages/chatDetail/index",
-      "style": {
-        "navigationBarTitleText": ""
-      }
-    },
+
     {
       "path": "pages/me/index",
       "style": {

@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-23 22:43:09
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-09-26 18:19:58
+ * @LastEditTime: 2024-10-09 17:31:26
  * @FilePath: \medical-front-end\src\pages\chatDetail\index.vue
  * @Description: a
  * 
@@ -33,14 +33,38 @@
       <view class="chatDetail-content-begin">
         <image :src="chatList.avatar" />
         <view class="chatDetail-content-begin-message">
-          <span
-            >嗨，我是你的医疗智能助手张医生！初次见面很开心。我可以回答你的健康问题，为你提供医疗建议，还能随时陪你聊天。你有什么想问的呢？</span
+          <span>
+            嗨，我是你的医疗智能助手张医生！初次见面很开心。我可以回答你的健康问题，为你提供医疗建议，还能随时陪你聊天。你有什么想问的呢？
+          </span>
+        </view>
+      </view>
+      <view class="chatDetail-content-chatting">
+        <view
+          class="chatDetail-content-chatting-container"
+          v-for="(item, index) in messageArray"
+          :key="index"
+        >
+          <view
+            class="chatDetail-content-chatting-container-item"
+            :style="{
+              alignSelf: item.label === 'user' ? 'flex-end' : 'flex-start',
+              backgroundColor: item.label === 'user' ? '#4CC6FF' : '#ebebeb',
+              color: item.label === 'user' ? '#fff' : 'black',
+            }"
           >
+            <span>{{ item.value }}</span>
+          </view>
         </view>
       </view>
     </view>
     <view class="chatDetail-bottom">
-      <input class="chatDetail-bottom-input" focus placeholder="发消息..." />
+      <input
+        v-model="inputRef"
+        class="chatDetail-bottom-input"
+        placeholder="发消息..."
+        @confirm="sendMessage"
+        @input="handleInput"
+      />
       <view class="chatDetail-bottom-options">
         <image src="../../static/images/detail/speak.png" />
         <image src="../../static/images/detail/add.png" />
@@ -50,7 +74,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { showToast } from "@/utils/helper";
+import { computed, defineComponent, reactive, ref } from "vue";
+type contentType = {
+  label: string; //user或者是assistant,分为用户询问和助手回答
+  value: string; //会话内容
+};
 export default defineComponent({
   name: "ChatDetail",
   components: {},
@@ -62,10 +91,60 @@ export default defineComponent({
   },
   setup(props) {
     const mute = ref(false); //是否静音，默认不静音
+    //会话数组
+
     console.log("props", JSON.parse(decodeURIComponent(props.chatDetail)));
     const chatInfo = computed(() => {
       return JSON.parse(decodeURIComponent(props.chatDetail));
     });
+    const useGPT = () => {
+      //输入框ref
+      const inputRef = ref("");
+      //会话数组ref
+      const messageArray = ref<Array<contentType>>([]);
+      //给消息数组发送消息
+      const addMessage = (role: string, message: string) => {
+        console.log("messageArray", messageArray);
+        messageArray.value.push({ label: role, value: message });
+        console.log("messageArray", messageArray.value);
+        inputRef.value = "";
+      };
+      //用户发送消息
+      const sendMessage = (mes: { detail: { value: string } }) => {
+        if (mes.detail.value === "") {
+          showToast("请输入您想问的消息");
+          return;
+        }
+        console.log("mes", mes.detail.value);
+        addMessage("user", mes.detail.value);
+        console.log("inputRef", inputRef);
+        setTimeout(() => {
+          addMessage("assistant", "这是测试回答");
+        }, 2000);
+      };
+      //监听输入值
+      const handleInput = () => {
+        // 获取当前输入的值
+        console.log("当前输入值:", inputRef.value);
+      };
+      //应用不同的样式
+      const getChatClass = (label: string) => {
+        switch (label) {
+          case "user":
+            return "chatDetail-content-chatting-user";
+          case "assistant":
+            return "chatDetail-content-chatting-assistant";
+        }
+      };
+      return {
+        messageArray,
+        addMessage,
+        sendMessage,
+        inputRef,
+        handleInput,
+        getChatClass,
+      };
+    };
     const chatList = {
       id: 0,
       avatar: "../../static/register/image1.jpg",
@@ -85,7 +164,21 @@ export default defineComponent({
         message: "你好",
       },
     ];
-    return { mute, chatInfo, chatList, handleMute, chatStack };
+
+    return {
+      mute,
+      chatInfo,
+      chatList,
+      handleMute,
+      chatStack,
+      ...useGPT(),
+    };
+  },
+  onPullDownRefresh() {
+    console.log("refresh");
+    setTimeout(function () {
+      uni.stopPullDownRefresh();
+    }, 1000);
   },
 });
 </script>
@@ -100,6 +193,9 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
     &-info {
       width: 550rpx;
       height: 100%;
@@ -134,11 +230,11 @@ export default defineComponent({
   }
   &-content {
     width: 100%;
-    height: 1000rpx;
+    margin-top: 80rpx;
+    padding: 0 30rpx 170rpx 30rpx;
+    box-sizing: border-box;
     &-begin {
       width: 100%;
-      box-sizing: border-box;
-      padding: 40rpx;
       display: flex;
       align-items: center;
       flex-direction: column;
@@ -148,6 +244,7 @@ export default defineComponent({
         border-radius: 50%;
       }
       &-message {
+        box-sizing: border-box;
         margin-top: 20rpx;
         padding: 30rpx;
         width: 100%;
@@ -157,20 +254,47 @@ export default defineComponent({
         letter-spacing: 0.5rpx;
       }
     }
+    &-chatting {
+      width: 100%;
+      height: fit-content;
+      &-container {
+        width: 100%;
+        margin-top: 30rpx;
+        display: flex;
+        flex-direction: column;
+        &-item {
+          width: fit-content;
+          border-radius: 20rpx;
+          padding: 20rpx;
+          span {
+            display: inline-block; /* 使 span 成为块级元素，便于控制宽度 */
+            overflow-wrap: break-word; /* 自动换行 */
+            word-wrap: break-word; /* 兼容旧版浏览器 */
+            hyphens: auto; /* 可选，添加连字符 */
+            max-width: 700rpx; /* 限制最大宽度为父容器的 100% */
+            font-size: $uni-font-size-base;
+          }
+        }
+      }
+    }
   }
   &-bottom {
     width: 100%;
     height: 150rpx;
-    position: absolute;
+    position: fixed;
     bottom: 0;
-    z-index: 1;
+    z-index: 2;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 10rpx;
+    backdrop-filter: blur(10px); /* 毛玻璃效果 */
+    background-color: rgba(255, 255, 255, 1); /* 半透明背景 */
+    border-top: 1px solid #ccc; /* 分隔线 */
     &-input {
       box-sizing: border-box;
+      background-color: #fff;
       width: 100%;
       height: 100rpx;
       padding: 0 0 0 30rpx;
@@ -191,6 +315,7 @@ export default defineComponent({
       image {
         width: 50rpx;
         height: 50rpx;
+        margin-right: 20rpx;
       }
     }
   }
