@@ -21,7 +21,7 @@ export const reLaunch = (url: string) => {
 
 export const showToast = (
   title: string,
-  icon: "success" | "loading" | "none" | undefined = "none",
+  icon: "success" | "loading" | "none" | "error" | undefined = "none",
   duration = 1
 ) => {
   uni.showToast({ title, icon, duration: duration * 1000 });

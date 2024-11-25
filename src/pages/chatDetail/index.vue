@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-23 22:43:09
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-10-09 17:31:26
+ * @LastEditTime: 2024-11-26 04:02:23
  * @FilePath: \medical-front-end\src\pages\chatDetail\index.vue
  * @Description: a
  * 
@@ -52,22 +52,38 @@
               color: item.label === 'user' ? '#fff' : 'black',
             }"
           >
-            <span>{{ item.value }}</span>
+            <text :decode="true">{{ item.value }}</text>
           </view>
         </view>
       </view>
+      <view class="chatDetail-content-more">
+        <span class="chatDetail-content-more-text">聊聊新话题</span>
+      </view>
     </view>
     <view class="chatDetail-bottom">
-      <input
-        v-model="inputRef"
-        class="chatDetail-bottom-input"
-        placeholder="发消息..."
-        @confirm="sendMessage"
-        @input="handleInput"
-      />
-      <view class="chatDetail-bottom-options">
-        <image src="../../static/images/detail/speak.png" />
-        <image src="../../static/images/detail/add.png" />
+      <view class="chatDetail-bottom-content">
+        <input
+          v-if="isTalk"
+          v-model="inputRef"
+          class="chatDetail-bottom-input"
+          placeholder="发消息..."
+          @confirm="sendMessage"
+          @input="handleInput"
+        />
+        <view class="chatDetail-bottom-talk" v-if="!isTalk">
+          <UAudio @recognize="handleTalkRecognize" a="11" />
+        </view>
+        <view class="chatDetail-bottom-options">
+          <image
+            :src="
+              isTalk
+                ? '../../static/images/detail/speak.png'
+                : '../../static/images/detail/type.png'
+            "
+            @click="handleTalkChange"
+          />
+          <image src="../../static/images/detail/add.png" />
+        </view>
       </view>
     </view>
   </view>
@@ -76,13 +92,14 @@
 <script lang="ts">
 import { showToast } from "@/utils/helper";
 import { computed, defineComponent, reactive, ref } from "vue";
+import UAudio from "@/components/UAudio/index.vue";
 type contentType = {
   label: string; //user或者是assistant,分为用户询问和助手回答
   value: string; //会话内容
 };
 export default defineComponent({
   name: "ChatDetail",
-  components: {},
+  components: { UAudio },
   props: {
     chatDetail: {
       type: String,
@@ -91,6 +108,7 @@ export default defineComponent({
   },
   setup(props) {
     const mute = ref(false); //是否静音，默认不静音
+    const isTalk = ref(false); //是否为说话状态，默认为打字
     //会话数组
 
     console.log("props", JSON.parse(decodeURIComponent(props.chatDetail)));
@@ -100,8 +118,10 @@ export default defineComponent({
     const useGPT = () => {
       //输入框ref
       const inputRef = ref("");
+
       //会话数组ref
       const messageArray = ref<Array<contentType>>([]);
+
       //给消息数组发送消息
       const addMessage = (role: string, message: string) => {
         console.log("messageArray", messageArray);
@@ -109,6 +129,7 @@ export default defineComponent({
         console.log("messageArray", messageArray.value);
         inputRef.value = "";
       };
+
       //用户发送消息
       const sendMessage = (mes: { detail: { value: string } }) => {
         if (mes.detail.value === "") {
@@ -122,10 +143,27 @@ export default defineComponent({
           addMessage("assistant", "这是测试回答");
         }, 2000);
       };
+
       //监听输入值
       const handleInput = () => {
         // 获取当前输入的值
         console.log("当前输入值:", inputRef.value);
+      };
+
+      //处理语音识别结束回调
+      const handleTalkRecognize = (res: any) => {
+        console.log("handleTalkRecognize", res);
+        if (res && res.success) {
+          addMessage("user", res.message);
+        } else if (res && !res.success) {
+          if (res.message === "query response empty result") {
+            showToast("未识别到文字");
+          } else if (res.message === "internal voice data failed") {
+            showToast("识别间隙太短，请多说两句");
+          } else {
+            showToast(res.message);
+          }
+        }
       };
       //应用不同的样式
       const getChatClass = (label: string) => {
@@ -136,6 +174,14 @@ export default defineComponent({
             return "chatDetail-content-chatting-assistant";
         }
       };
+      //是否静音
+      const handleMute = () => {
+        mute.value = !mute.value;
+      };
+      //切换输入模式，是打字还是语音
+      const handleTalkChange = () => {
+        isTalk.value = !isTalk.value;
+      };
       return {
         messageArray,
         addMessage,
@@ -143,16 +189,18 @@ export default defineComponent({
         inputRef,
         handleInput,
         getChatClass,
+        isTalk,
+        handleMute,
+        handleTalkChange,
+        handleTalkRecognize,
       };
     };
+
     const chatList = {
       id: 0,
       avatar: "../../static/register/image1.jpg",
       name: "张医生",
       text: "您需要一个怎样的诊断...",
-    };
-    const handleMute = () => {
-      mute.value = !mute.value;
     };
     const chatStack = [
       {
@@ -169,7 +217,6 @@ export default defineComponent({
       mute,
       chatInfo,
       chatList,
-      handleMute,
       chatStack,
       ...useGPT(),
     };
@@ -277,10 +324,37 @@ export default defineComponent({
         }
       }
     }
+
+    &-more {
+      position: relative;
+      text-align: center;
+      margin: 20px 0;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: #ddd;
+        z-index: -1;
+      }
+
+      &-text {
+        z-index: 1;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: gray;
+        background-color: $uni-bg-color;
+        padding: 0 10px;
+      }
+    }
   }
+
   &-bottom {
     width: 100%;
-    height: 150rpx;
+    height: 170rpx;
     position: fixed;
     bottom: 0;
     z-index: 2;
@@ -291,7 +365,16 @@ export default defineComponent({
     padding: 10rpx;
     backdrop-filter: blur(10px); /* 毛玻璃效果 */
     background-color: rgba(255, 255, 255, 1); /* 半透明背景 */
-    border-top: 1px solid #ccc; /* 分隔线 */
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
+      rgba(0, 0, 0, 0.22) 0px 15px 12px;
+    &-content {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      border-radius: 30rpx;
+      background-color: #fff;
+      box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    }
     &-input {
       box-sizing: border-box;
       background-color: #fff;
@@ -302,6 +385,12 @@ export default defineComponent({
       border-bottom-left-radius: 30rpx;
       box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     }
+
+    &-talk {
+      width: 100%;
+      height: 50px;
+    }
+
     &-options {
       display: flex;
       flex-direction: row;
