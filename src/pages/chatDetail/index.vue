@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-23 22:43:09
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-11-26 04:02:23
+ * @LastEditTime: 2024-11-27 19:17:05
  * @FilePath: \medical-front-end\src\pages\chatDetail\index.vue
  * @Description: a
  * 
@@ -61,23 +61,33 @@
       </view>
     </view>
     <view class="chatDetail-bottom">
+      <view v-if="isRecording" class="chatDetail-bottom-recording">
+        <URecording />
+      </view>
       <view class="chatDetail-bottom-content">
         <input
-          v-if="isTalk"
+          v-if="!isTalk"
           v-model="inputRef"
           class="chatDetail-bottom-input"
           placeholder="发消息..."
           @confirm="sendMessage"
           @input="handleInput"
         />
-        <view class="chatDetail-bottom-talk" v-if="!isTalk">
-          <UAudio @recognize="handleTalkRecognize" a="11" />
+        <view class="chatDetail-bottom-talk" v-if="isTalk">
+          <UAudio
+            @recognize="handleTalkRecognize"
+            @start="handleTalkStart"
+            @end="handleTalkEnd"
+            @cancel="handleTalkEnd"
+          />
         </view>
         <view class="chatDetail-bottom-options">
           <image
             :src="
-              isTalk
+              !isTalk
                 ? '../../static/images/detail/speak.png'
+                : isRecognizing
+                ? '../../static/images/detail/type-disabled.png'
                 : '../../static/images/detail/type.png'
             "
             @click="handleTalkChange"
@@ -91,15 +101,23 @@
 
 <script lang="ts">
 import { showToast } from "@/utils/helper";
-import { computed, defineComponent, reactive, ref } from "vue";
+import {
+  computed,
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+} from "vue";
 import UAudio from "@/components/UAudio/index.vue";
+import URecording from "@/components/URecording/index.vue";
 type contentType = {
   label: string; //user或者是assistant,分为用户询问和助手回答
   value: string; //会话内容
 };
+
 export default defineComponent({
   name: "ChatDetail",
-  components: { UAudio },
+  components: { UAudio, URecording },
   props: {
     chatDetail: {
       type: String,
@@ -109,12 +127,16 @@ export default defineComponent({
   setup(props) {
     const mute = ref(false); //是否静音，默认不静音
     const isTalk = ref(false); //是否为说话状态，默认为打字
-    //会话数组
-
+    const isRecording = ref(false); //是否为录音状态，默认为false
+    const isRecognizing = ref(false); //是否在识别状态，默认为false
     console.log("props", JSON.parse(decodeURIComponent(props.chatDetail)));
+
+    //会话信息
     const chatInfo = computed(() => {
       return JSON.parse(decodeURIComponent(props.chatDetail));
     });
+
+    /* 语言模型相关状态方法 */
     const useGPT = () => {
       //输入框ref
       const inputRef = ref("");
@@ -150,6 +172,25 @@ export default defineComponent({
         console.log("当前输入值:", inputRef.value);
       };
 
+      //处理语音录音开始回调
+      const handleTalkStart = (res: any) => {
+        console.log("handleTalkStart", res);
+        //处理开始录制回调，如果开始录制，则将正在录制状态修改为true
+        if (res) {
+          isRecording.value = true;
+          isRecognizing.value = true;
+        }
+      };
+
+      //处理语音录音结束回调
+      const handleTalkEnd = (res: any) => {
+        console.log("handleTalkEnd", res);
+        //处理开始录制回调，如果开始录制，则将正在录制状态修改为true
+        if (res) {
+          isRecording.value = false;
+        }
+      };
+
       //处理语音识别结束回调
       const handleTalkRecognize = (res: any) => {
         console.log("handleTalkRecognize", res);
@@ -164,7 +205,9 @@ export default defineComponent({
             showToast(res.message);
           }
         }
+        isRecognizing.value = false;
       };
+
       //应用不同的样式
       const getChatClass = (label: string) => {
         switch (label) {
@@ -180,7 +223,12 @@ export default defineComponent({
       };
       //切换输入模式，是打字还是语音
       const handleTalkChange = () => {
-        isTalk.value = !isTalk.value;
+        //如果不是正在识别的状态，则可以切换，如果不是，则不可以取消
+        if (!isRecognizing.value) {
+          isTalk.value = !isTalk.value;
+        } else {
+          return;
+        }
       };
       return {
         messageArray,
@@ -193,6 +241,8 @@ export default defineComponent({
         handleMute,
         handleTalkChange,
         handleTalkRecognize,
+        handleTalkStart,
+        handleTalkEnd,
       };
     };
 
@@ -202,6 +252,7 @@ export default defineComponent({
       name: "张医生",
       text: "您需要一个怎样的诊断...",
     };
+
     const chatStack = [
       {
         id: 0,
@@ -219,6 +270,8 @@ export default defineComponent({
       chatList,
       chatStack,
       ...useGPT(),
+      isRecording,
+      isRecognizing,
     };
   },
   onPullDownRefresh() {
@@ -282,6 +335,8 @@ export default defineComponent({
     box-sizing: border-box;
     &-begin {
       width: 100%;
+      box-sizing: border-box;
+      padding: 20px 0;
       display: flex;
       align-items: center;
       flex-direction: column;
@@ -367,10 +422,18 @@ export default defineComponent({
     background-color: rgba(255, 255, 255, 1); /* 半透明背景 */
     box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
       rgba(0, 0, 0, 0.22) 0px 15px 12px;
+
+    &-recording {
+      width: 100%;
+      position: absolute;
+      bottom: 100%;
+    }
+
     &-content {
       width: 100%;
       display: flex;
       flex-direction: row;
+      align-items: center;
       border-radius: 30rpx;
       background-color: #fff;
       box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
