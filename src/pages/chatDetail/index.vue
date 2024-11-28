@@ -2,7 +2,7 @@
  * @Author: LLumpe LLumpe@163.com
  * @Date: 2024-09-23 22:43:09
  * @LastEditors: LLumpe LLumpe@163.com
- * @LastEditTime: 2024-11-27 19:17:05
+ * @LastEditTime: 2024-11-28 09:26:19
  * @FilePath: \medical-front-end\src\pages\chatDetail\index.vue
  * @Description: a
  * 
@@ -110,6 +110,7 @@ import {
 } from "vue";
 import UAudio from "@/components/UAudio/index.vue";
 import URecording from "@/components/URecording/index.vue";
+import { requestGetMessageByGPT } from "@/api/detail";
 type contentType = {
   label: string; //user或者是assistant,分为用户询问和助手回答
   value: string; //会话内容

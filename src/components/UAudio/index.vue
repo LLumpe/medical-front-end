@@ -246,6 +246,7 @@ export default defineComponent({
   justify-content: center;
   flex-direction: column;
   position: relative;
+
   &-recording {
     width: 100%;
     position: absolute;
